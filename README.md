@@ -48,6 +48,18 @@ $ vagrant plugin list
 vagrant-libvirt (0.0.45, system)
 ```
 
+If you dont like typing sudo passworts to prune rotten NFS shares, then setup
+sudo properly. Run `sudo visudo /etc/sudoers` and append the snippet below:
+```
+Cmnd_Alias VAGRANT_EXPORTS_CHOWN = /bin/chown 0\:0 /tmp/*
+Cmnd_Alias VAGRANT_EXPORTS_MV = /bin/mv -f /tmp/* /etc/exports
+Cmnd_Alias VAGRANT_NFSD_CHECK = /etc/init.d/nfs-kernel-server status
+Cmnd_Alias VAGRANT_NFSD_START = /etc/init.d/nfs-kernel-server start
+Cmnd_Alias VAGRANT_NFSD_APPLY = /usr/sbin/exportfs -ar
+%sudo ALL=(root) NOPASSWD: VAGRANT_EXPORTS_CHOWN, VAGRANT_EXPORTS_MV, VAGRANT_NFSD_CHECK, VAGRANT_NFSD_START, VAGRANT_NFSD_APPLY
+```
+
+
 ## prepare
 
 * place a valid openvpn client certificate/config in `./etc/client.ovpn`
@@ -233,7 +245,7 @@ $ vagrant ssh
 direnv: loading .envrc
 direnv: export +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_ECR_REPOSITORY +AWS_SECRET_ACCESS_KEY +CROWDIN_PROJECT_ID +CROWDIN_TOKEN +NPM_TOKEN +SONAR_TOKEN +TAXJAR_TOKEN +VAULT_ADDR
 vagrant@void-state:~$ docker pull 0123456789.dkr.ecr.eu-central-1.amazonaws.com/coma:3.1415
-3.16.2: Pulling from 3yd-yoda
+3.1415: Pulling from coma
 4167d3e14976: Pull complete
 db94a93dfca0: Pull complete
 50b16383aa44: Pull complete
