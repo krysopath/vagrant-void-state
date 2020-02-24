@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
 
 
     stateless.vm.provision "shell",
-      path: "bin/vault-login",
+      path: "/vagrant/etc/vault-login",
       env: {"VAULT_TOKEN" => ENV['VAULT_TOKEN']}
 
     stateless.vm.provision "ansible_local" do |a|
