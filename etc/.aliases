@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# lets define some useful functions for our shared $HOME
+function secretify() {
+	for line in $(gpg -dq "${1:-$HOME/.secrets.gpg}" | sed "s/\s*#.*//g; /^$/ d");
+	do
+		export "$line" 2>/dev/null;
+	done;
+}
+
+# can fetch a ssh private key for a random CI instance
+function vssh() {
+	DATA=$(vault read -format=json secret/services/shared/ssh/$1);
+	( test -z $SSH_AUTH_SOCK && eval $(ssh-agent) );
+	ssh-add -t 10 <(jq -r .data.id_rsa <<<$DATA|base64 -d);
+	ssh $(jq -r .data.username<<<$DATA)@$(jq -r .data.host<<<$DATA) "${@:2}";
+}
+
+# can create a vault token, like so `vtoken 1h20m developer devops`
+function vtoken() {
+	vault token create -ttl=$1 -format=json $(\
+		ARGS="";
+		for pol in "${@:2}";
+		do
+			ARGS+="-policy=$pol ";
+		done;
+		echo $ARGS) | jq -r .auth.client_token;
+}
+
+function vaultified() {
+	for leafnode in "$@";
+	do
+		for values in $(vault kv get $leafnode|sed -E "1,3d;s,^([A-Z_]+)[[:space:]]+(.*)$,\1=\2,");
+		do
+			export $values;
+		done;
+	done;
+}
+
+alias toclip='xclip -i -selection clipboard'
+
+alias fromclip='xclip -o -selection clipboard'
+

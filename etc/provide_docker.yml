@@ -1,0 +1,22 @@
+- name: add dockers GPG key for signatures
+  become: yes
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg|apt-key add -
+    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+- name: install docker
+  become: yes
+  apt:
+    name: "{{docker_deps}}"
+    state: latest
+
+- name: fetch docker-compose
+  become: yes
+  shell: |
+    curl -L "https://github.com/docker/compose/releases/download/{{docker_compose}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+- name: configure ecr helper
+  copy:
+    src: /vagrant/etc/.docker
+    dest: /home/vagrant/
+
