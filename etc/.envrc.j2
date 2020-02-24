@@ -5,4 +5,12 @@ export VAULT_ADDR=https://vault.internal.3yourmind.com:443
 
 
 # lastly enrich the session with vault data
+
+function vaultified() {
+	for leafnode in "$@"; do
+		for values in $(vault kv get $leafnode\
+			|sed -E "1,3d;s,^([A-Z_]+)[[:space:]]+(.*)$,\1=\2,"); do 
+			export $values; done;
+	done;
+}
 vaultified secret/services/shared/env

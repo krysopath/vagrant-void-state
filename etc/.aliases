@@ -27,16 +27,6 @@ function vtoken() {
 		echo $ARGS) | jq -r .auth.client_token;
 }
 
-function vaultified() {
-	for leafnode in "$@";
-	do
-		for values in $(vault kv get $leafnode|sed -E "1,3d;s,^([A-Z_]+)[[:space:]]+(.*)$,\1=\2,");
-		do
-			export $values;
-		done;
-	done;
-}
-
 alias toclip='xclip -i -selection clipboard'
 
 alias fromclip='xclip -o -selection clipboard'
