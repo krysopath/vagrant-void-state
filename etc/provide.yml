@@ -20,6 +20,7 @@
     docker_deps:
       - docker-ce
       - docker-ce-cli
+      - amazon-ecr-credential-helper
     os_deps:
       - apt-transport-https
       - ca-certificates
@@ -32,7 +33,6 @@
       - direnv
       - openvpn
       - openvpn-systemd-resolved
-      - amazon-ecr-credential-helper
 
   handlers:
     - name: daemon reload
@@ -114,9 +114,8 @@
 
       - name: install pip deps
         pip:
-          name: "{{item}}"
+          name: "{{ pip2_deps }}"
           executable: pip2
-        with_items: "{{ pip2_deps }}"
 
       - name: clone asdf
         git:
@@ -167,7 +166,7 @@
         copy:
           src: .aliases
           dest: ~/.aliases
-      - name: set alias
+      - name: hook aliases file
         lineinfile:
           path: ~/.bashrc
           regexp: '^. ~/.aliases$'

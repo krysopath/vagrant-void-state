@@ -1,8 +1,15 @@
-- name: add dockers GPG key for signatures
+
+- name: add docker apt key
   become: yes
-  shell: |
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg|apt-key add -
-    add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: add docker apt repo
+  become: yes
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable"
+    state: present
 
 - name: install docker
   become: yes
@@ -12,8 +19,10 @@
 
 - name: fetch docker-compose
   become: yes
-  shell: |
-    curl -L "https://github.com/docker/compose/releases/download/{{docker_compose}}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/{{docker_compose}}/docker-compose-Linux-x86_64"
+    dest: /usr/local/bin/docker-compose
+    mode: '0750'
 
 - name: configure ecr helper
   copy:
