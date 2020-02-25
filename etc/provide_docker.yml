@@ -29,3 +29,10 @@
     src: /vagrant/etc/.docker
     dest: /home/vagrant/
 
+- name: Adding user {{ user }}
+  become: yes
+  user:
+    name: vagrant
+    groups: docker
+    append: yes
+

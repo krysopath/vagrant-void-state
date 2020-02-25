@@ -102,7 +102,6 @@
         regexp: '^DNSSEC=yes$'
         line: 'DNSSEC=no'
 
-
     - name: create environment
       become: vagrant
       block:
@@ -128,7 +127,6 @@
           path: ~/.bashrc
           regexp: '^\. ~/.asdf/asdf.sh$'
           line: '. ~/.asdf/asdf.sh'
-
 
       - name: load asdf context
         lineinfile:
