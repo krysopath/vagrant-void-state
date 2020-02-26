@@ -137,6 +137,7 @@
           line: '. ~/.asdf/completions/asdf.bash'
 
       - name: install asdf pugins
+        when: asdf_tools
         shell: |
           {{asdf}} plugin-add {{item.name}}
           {{asdf}} install {{item.name}} {{item.ver}}
@@ -148,7 +149,7 @@
           ASDF_DIR: /home/vagrant/.asdf
         loop: "{{ asdf_plugins }}"
         register: cmd
-        failed_when: cmd.rc != 0 and cmd.rc != 2
+        failed_when: cmd.rc != 0
 
       - name: create a vaultified direnv .envrc for vagrant
         notify:
@@ -171,3 +172,9 @@
           path: ~/.bashrc
           regexp: '^. ~/.aliases$'
           line: '. ~/.aliases'
+
+      - name: write ~/.vault_token
+        lineinfile:
+          create: yes
+          path: ~/.vault_token
+          line: "{{ vault_token }}"

@@ -15,14 +15,13 @@ Vagrant.configure("2") do |config|
     stateless.vm.synced_folder "etc", "/vagrant/etc"
     stateless.vm.synced_folder "src", "/home/vagrant/src"
 
-
-    stateless.vm.provision "shell",
-      path: "etc/vault-login",
-      env: {"VAULT_TOKEN" => ENV['VAULT_TOKEN']}
-
     stateless.vm.provision "ansible_local" do |a|
+      a.compatibility_mode  = "2.0"
       a.playbook = "/vagrant/etc/provide.yml"
+      a.extra_vars = {
+        vault_token: ENV['VAULT_TOKEN'],
+        asdf_tools: true
+      }
     end
-
   end
 end
