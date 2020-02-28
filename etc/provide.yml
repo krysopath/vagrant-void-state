@@ -53,7 +53,7 @@
     - name: restart openvpn
       become: yes
       systemd:
-        name: openvpn-client@threeyd
+        name: openvpn-client@vagrant
         state: restarted
         enabled: yes
     - name: restart sshd
@@ -122,7 +122,7 @@
         - sleep for openvpn
       copy:
         src: client.ovpn
-        dest: /etc/openvpn/client/threeyd.conf
+        dest: /etc/openvpn/client/vagrant.conf
 
     - name: disable DNSSEC for systemd-resolved because systemd is epiko
       become: yes
