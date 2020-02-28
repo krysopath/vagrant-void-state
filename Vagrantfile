@@ -15,6 +15,10 @@ Vagrant.configure("2") do |config|
     stateless.vm.synced_folder "etc", "/vagrant/etc"
     stateless.vm.synced_folder "src", "/home/vagrant/src"
 
+    stateless.ssh.forward_agent = true
+    stateless.ssh.forward_env = ["VAULT_TOKEN",]
+
+
     stateless.vm.provision "ansible_local" do |a|
       a.compatibility_mode  = "2.0"
       a.playbook = "/vagrant/etc/provide.yml"

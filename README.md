@@ -82,18 +82,17 @@ password
 
 ```
 $ make up
-VAULT_TOKEN=s.odvb8y4nrugilngdhkjd vagrant up
 Bringing machine 'stateless' up with 'libvirt' provider...
 ==> stateless: Checking if box 'generic/ubuntu1904' version '2.0.6' is up to date...
 ==> stateless: Creating image (snapshot of base box volume).
 ==> stateless: Creating domain with the following settings...
 ==> stateless:  -- Name:              work_stateless
 ==> stateless:  -- Domain type:       kvm
-==> stateless:  -- Cpus:              2
+==> stateless:  -- Cpus:              6
 ==> stateless:  -- Feature:           acpi
 ==> stateless:  -- Feature:           apic
 ==> stateless:  -- Feature:           pae
-==> stateless:  -- Memory:            2048M
+==> stateless:  -- Memory:            4096M
 ==> stateless:  -- Management MAC:
 ==> stateless:  -- Loader:
 ==> stateless:  -- Nvram:
@@ -127,27 +126,21 @@ Bringing machine 'stateless' up with 'libvirt' provider...
     stateless: Key inserted! Disconnecting and reconnecting using new SSH key...
 ==> stateless: Setting hostname...
 ==> stateless: Forwarding ports...
-==> stateless: 80 (guest) => 8118 (host) (adapter eth0)
+==> stateless: 80 (guest) => 8080 (host) (adapter eth0)
+==> stateless: 443 (guest) => 8443 (host) (adapter eth0)
 ==> stateless: Configuring and enabling network interfaces...
 ==> stateless: Installing NFS client...
 ==> stateless: Exporting NFS shared folders...
 ==> stateless: Preparing to edit /etc/exports. Administrator privileges will be required...
 ==> stateless: Mounting NFS shared folders...
-==> stateless: Running provisioner: shell...
-    stateless: Running: /tmp/vagrant-shell20200224-20903-v3fze4
 ==> stateless: Running provisioner: ansible_local...
     stateless: Installing Ansible...
-Vagrant has automatically selected the compatibility mode '2.0'
-according to the Ansible version installed (2.9.4).
-
-Alternatively, the compatibility mode can be specified in your Vagrantfile:
-https://www.vagrantup.com/docs/provisioning/ansible_common.html#compatibility_mode
-
     stateless: Running ansible-playbook...
 
 PLAY [all] *********************************************************************
 
 TASK [Gathering Facts] *********************************************************
+ok: [stateless]
 [DEPRECATION WARNING]: Distribution Ubuntu 19.04 on host stateless should use
 /usr/bin/python3, but is using /usr/bin/python for backward compatibility with
 prior Ansible releases. A future Ansible release will default to using the
@@ -155,20 +148,17 @@ discovered platform python for this host. See https://docs.ansible.com/ansible/
 2.9/reference_appendices/interpreter_discovery.html for more information. This
 feature will be removed in version 2.12. Deprecation warnings can be disabled
 by setting deprecation_warnings=False in ansible.cfg.
-ok: [stateless]
 
 TASK [install os deps] *********************************************************
 [WARNING]: Updating cache and auto-installing missing dependency: python-apt
 
 changed: [stateless]
 
-TASK [add dockers GPG key for signatures] **************************************
+TASK [add docker apt key] ******************************************************
 changed: [stateless]
-[WARNING]: Consider using the get_url or uri module rather than running 'curl'.
-If you need to use command because get_url or uri is insufficient you can add
-'warn: false' to this command task or set 'command_warnings=False' in
-ansible.cfg to get rid of this message.
 
+TASK [add docker apt repo] *****************************************************
+changed: [stateless]
 
 TASK [install docker] **********************************************************
 changed: [stateless]
@@ -177,6 +167,18 @@ TASK [fetch docker-compose] ****************************************************
 changed: [stateless]
 
 TASK [configure ecr helper] ****************************************************
+changed: [stateless]
+
+TASK [Adding user {{ user }}] **************************************************
+changed: [stateless]
+
+TASK [allow sending some shell variables] **************************************
+changed: [stateless]
+
+TASK [make openvpn always restart] *********************************************
+changed: [stateless]
+
+TASK [make openvpn always restart] *********************************************
 changed: [stateless]
 
 TASK [make openvpn always restart] *********************************************
@@ -192,20 +194,15 @@ TASK [extend PATH] *************************************************************
 changed: [stateless]
 
 TASK [install pip deps] ********************************************************
-[DEPRECATION WARNING]: Invoking "pip" only once while using a loop via
-squash_actions is deprecated. Instead of using a loop to supply multiple items
-and specifying `name: "{{item}}"`, please use `name: '{{ pip2_deps }}'` and
-remove the loop. This feature will be removed in version 2.11. Deprecation
-warnings can be disabled by setting deprecation_warnings=False in ansible.cfg.
-changed: [stateless] => (item=[u'j2'])
+changed: [stateless]
 
 TASK [clone asdf] **************************************************************
 changed: [stateless]
 
-TASK [load asdf context] *******************************************************
+TASK [hook asdf context into shell] ********************************************
 changed: [stateless]
 
-TASK [load asdf context] *******************************************************
+TASK [load asdf shell completions] *********************************************
 changed: [stateless]
 
 TASK [install asdf pugins] *****************************************************
@@ -215,14 +212,18 @@ changed: [stateless] => (item={u'ver': u'0.10.4', u'name': u'nomad'})
 changed: [stateless] => (item={u'ver': u'0.12.21', u'name': u'terraform'})
 changed: [stateless] => (item={u'ver': u'0.22.4', u'name': u'terragrunt'})
 changed: [stateless] => (item={u'ver': u'1.3.0', u'name': u'vault'})
+changed: [stateless] => (item={u'ver': u'0.16.1', u'name': u'k9s'})
 
 TASK [create a vaultified direnv .envrc for vagrant] ***************************
 changed: [stateless]
 
-TASK [allow /home/vagrant/.envrc] **********************************************
+TASK [enable direnv hooks] *****************************************************
 changed: [stateless]
 
-TASK [enable direnv hooks] *****************************************************
+TASK [copy .aliases] ***********************************************************
+changed: [stateless]
+
+TASK [hook aliases file] *******************************************************
 changed: [stateless]
 
 RUNNING HANDLER [daemon reload] ************************************************
@@ -234,17 +235,24 @@ changed: [stateless]
 RUNNING HANDLER [restart openvpn] **********************************************
 changed: [stateless]
 
+RUNNING HANDLER [restart sshd] *************************************************
+changed: [stateless]
+
 RUNNING HANDLER [sleep for openvpn] ********************************************
 ok: [stateless]
 
+RUNNING HANDLER [direnv allow] *************************************************
+changed: [stateless]
+
 PLAY RECAP *********************************************************************
-stateless                  : ok=22   changed=19   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+stateless                  : ok=30   changed=27   unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 
 
-$ vagrant ssh
+
+$ make ssh
 direnv: loading .envrc
 direnv: export +AWS_ACCESS_KEY_ID +AWS_DEFAULT_REGION +AWS_ECR_REPOSITORY +AWS_SECRET_ACCESS_KEY +CROWDIN_PROJECT_ID +CROWDIN_TOKEN +NPM_TOKEN +SONAR_TOKEN +TAXJAR_TOKEN +VAULT_ADDR
-vagrant@void-state:~$ docker pull 0123456789.dkr.ecr.eu-central-1.amazonaws.com/coma:3.1415
+vagrant@void-state:~$ docker pull 0123456789.dkr.ecr.uranus-0.amazonaws.com/coma:3.1415
 3.1415: Pulling from coma
 4167d3e14976: Pull complete
 db94a93dfca0: Pull complete

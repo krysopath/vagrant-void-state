@@ -1,5 +1,8 @@
 - hosts: all
   vars:
+    AcceptEnv:
+      - VAULT_*
+      - AWS_*
     docker_compose: 1.25.4
     asdf: ~/.asdf/bin/asdf
     asdf_plugins:
@@ -53,20 +56,18 @@
         name: openvpn-client@threeyd
         state: restarted
         enabled: yes
+    - name: restart sshd
+      become: yes
+      systemd:
+        name: sshd
+        state: restarted
+        enabled: yes
     - name: sleep for openvpn
       wait_for:
         timeout: 30
     - name: direnv allow
       command: direnv allow ~/.envrc
   tasks:
-#    - name: Upgrade all packages to the latest version
-#      become: yes
-#      apt:
-#        name: "*"
-#        state: latest
-#        cache_valid_time: 3600
-#        update_cache: yes
-
     - name: install os deps
       become: yes
       apt:
@@ -75,6 +76,15 @@
 
     - name: import docker tasks
       import_tasks: provide_docker.yml
+
+    - name: allow sending some shell variables
+      become: yes
+      notify:
+        - restart sshd
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AcceptEnv LANG LC_\*$'
+        line: "AcceptEnv LANG LC_* {{ AcceptEnv | join(' ') }}"
 
     - name: make openvpn always restart
       become: yes
@@ -85,6 +95,25 @@
         insertafter: '^\[Service\]$'
         regexp: '^Restart=always$'
         line: 'Restart=always'
+
+    - name: make openvpn always restart
+      become: yes
+      notify:
+        - daemon reload
+      lineinfile:
+        path: /lib/systemd/system/openvpn-client@.service
+        insertafter: '^\[Service\]$'
+        regexp: '^RestartSec=$'
+        line: 'RestartSec=5'
+    - name: make openvpn always restart
+      become: yes
+      notify:
+        - daemon reload
+      lineinfile:
+        path: /lib/systemd/system/openvpn-client@.service
+        insertafter: '^\[Service\]$'
+        regexp: '^StartLimitInterval=$'
+        line: 'StartLimitInterval=0'
 
     - name: copy openvpn client conf
       become: yes
@@ -124,13 +153,13 @@
           dest: ~/.asdf
           version: v0.7.6
 
-      - name: load asdf context
+      - name: hook asdf context into shell
         lineinfile:
           path: ~/.bashrc
           regexp: '^\. ~/.asdf/asdf.sh$'
           line: '. ~/.asdf/asdf.sh'
 
-      - name: load asdf context
+      - name: load asdf shell completions
         lineinfile:
           path: ~/.bashrc
           regexp: '^\. ~/.asdf/completions/asdf.bash$'
@@ -172,9 +201,3 @@
           path: ~/.bashrc
           regexp: '^. ~/.aliases$'
           line: '. ~/.aliases'
-
-      - name: write ~/.vault_token
-        lineinfile:
-          create: yes
-          path: ~/.vault_token
-          line: "{{ vault_token }}"
