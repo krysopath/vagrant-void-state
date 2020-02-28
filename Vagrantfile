@@ -1,11 +1,20 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+MEMORY_MB = "4096"
+NUM_CORES = 6
+
 Vagrant.configure("2") do |config|
   config.vm.define "stateless" do |stateless|
+
     stateless.vm.provider "libvirt" do |v|
-      v.memory = 4096
-      v.cpus = 6
+      v.memory = MEMORY_MB
+      v.cpus = NUM_CORES
+    end
+
+    stateless.vm.provider "virtualbox" do |v|
+      v.memory = MEMORY_MB
+      v.cpus = NUM_CORES
     end
 
     stateless.vm.box = "generic/ubuntu1904"
@@ -16,8 +25,12 @@ Vagrant.configure("2") do |config|
     stateless.vm.synced_folder "src", "/home/vagrant/src"
 
     stateless.ssh.forward_agent = true
-    stateless.ssh.forward_env = ["VAULT_TOKEN",]
-
+    stateless.ssh.forward_env = [
+      "VAULT_TOKEN",
+      "VAULT_ADDR",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY"
+    ]
 
     stateless.vm.provision "ansible_local" do |a|
       a.compatibility_mode  = "2.0"
