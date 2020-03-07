@@ -31,7 +31,7 @@ Vagrant.configure("2") do |config|
     stateless.ssh.keys_only = false
     stateless.ssh.private_key_path = [
       "~/.vagrant.d/insecure_private_key",
-	  "~/.ssh/id_rsa",
+      "~/.ssh/id_rsa",
     ]
     stateless.ssh.forward_env = [
       "VAULT_TOKEN",
