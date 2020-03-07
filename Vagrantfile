@@ -36,6 +36,7 @@ Vagrant.configure("2") do |config|
     stateless.ssh.forward_env = [
       "VAULT_TOKEN",
       "VAULT_ADDR",
+      "VAULT_PATHS",
       "AWS_ACCESS_KEY_ID",
       "AWS_SECRET_ACCESS_KEY"
     ]
