@@ -136,6 +136,31 @@
     - name: create environment
       become: vagrant
       block:
+      - name: set ~/.ssh/config defaults
+        template:
+          src: .ssh/config.j2
+          dest: ~/.ssh/config
+      - name: create user service dir
+        file:
+          name: ~/.config/systemd/user
+          state: directory
+      - name: render ssh-agent user service
+        template:
+          src: .config/systemd/user/ssh-agent.service.j2
+          dest: ~/.config/systemd/user/ssh-agent.service
+      - name: enable user service for ssh-agent
+        systemd:
+          name: ssh-agent
+          scope: user
+          state: started
+          enabled: yes
+          daemon-reload: yes
+
+      - name: SSH_AUTH_SOCK shell variable
+        lineinfile:
+          path: ~/.bashrc
+          line: 'export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
+
 
       - name: extend PATH
         lineinfile:
