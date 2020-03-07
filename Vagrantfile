@@ -17,14 +17,22 @@ Vagrant.configure("2") do |config|
       v.cpus = NUM_CORES
     end
 
+    stateless.vm.network "private_network", ip: "10.10.10.10"
+
     stateless.vm.box = "generic/ubuntu1904"
     stateless.vm.hostname = "void-state"
     stateless.vm.network "forwarded_port", guest: 80, host: 8080
     stateless.vm.network "forwarded_port", guest: 443, host: 8443
     stateless.vm.synced_folder "etc", "/vagrant/etc"
     stateless.vm.synced_folder "src", "/home/vagrant/src"
+    stateless.vm.synced_folder "~/.ssh/", "/home/vagrant/.ssh"
 
     stateless.ssh.forward_agent = true
+    stateless.ssh.keys_only = false
+    stateless.ssh.private_key_path = [
+      "~/.vagrant.d/insecure_private_key",
+	  "~/.ssh/id_rsa",
+    ]
     stateless.ssh.forward_env = [
       "VAULT_TOKEN",
       "VAULT_ADDR",
