@@ -17,6 +17,15 @@ Vagrant.configure("2") do |config|
       v.cpus = NUM_CORES
     end
 
+    stateless.vm.provider "aws" do |aws|
+      aws.instance_type = "t3.medium"
+      aws.keypair_name = "Georg"
+      aws.monitoring = false
+      aws.region = "eu-central-1"
+      aws.subnet_id = "vpc-3f52bc56"
+      aws.ami = "ami-066866b740d9ce5a7"
+    end
+
     stateless.vm.network "private_network", ip: "10.10.10.10"
 
     stateless.vm.box = "generic/ubuntu1904"
@@ -26,7 +35,8 @@ Vagrant.configure("2") do |config|
     stateless.vm.synced_folder "etc", "/vagrant/etc"
     stateless.vm.synced_folder "~/.gnupg", "/home/vagrant/.gnupg"
 
-    stateless.ssh.forward_agent = true
+    #stateless.ssh.forward_agent = true
+    #stateless.ssh.keys_only  = false
     stateless.ssh.forward_env = [
       "VAULT_TOKEN",
       "VAULT_ADDR",
@@ -40,7 +50,9 @@ Vagrant.configure("2") do |config|
 
     stateless.vm.provision "ansible_local" do |a|
       a.compatibility_mode  = "2.0"
-      a.playbook = "/vagrant/etc/provide.yml"
+      a.provisioning_path  = "/vagrant/etc/"
+      a.playbook = "provide.yml"
+      a.playbook_command = "ansible-playbook -e@defaults.yml"
       a.extra_vars = {
         apt: {
           cache_valid: 3600,
@@ -58,52 +70,27 @@ Vagrant.configure("2") do |config|
             {src: "git@bitbucket.org:3yourmind/e2e-tests.git", dest: "~/src/3yourmind/e2e-tests"},
             {src: "git@bitbucket.org:3yourmind/3yourmind.git", dest: "~/src/3yourmind/3yourmind"},
           ],
-          clone: false,
+          clone: true,
         },
-        AcceptEnv: ["VAULT_*", "AWS_*"],
-        docker_compose: "1.25.4",
         dotfiles: {
           src: "git@github.com:krysopath/dotfiles.git",
-          dest: '~/.dotfiles',
-          version: 'master',
           active: true,
-          clone: true,
-          checkout: true,
-          force: true,
         },
         asdf: {
           refresh: true,
-          version: "v0.7.6",
-          path: "~/.asdf/bin/asdf",
           plugins: [
+            {name: "vault", ver: "1.3.0"},
             {name: "helm", ver: "3.1.1"},
             {name: "kubectl", ver: "1.17.3"},
             {name: "nomad", ver: "0.10.4"},
             {name: "terraform", ver: "0.12.21"},
             {name: "terragrunt", ver: "0.22.4"},
-            {name: "vault", ver: "1.3.0"},
             {name: "k9s", ver: "0.16.1"},
+            {name: "python", ver: "3.8.2"},
           ],
         },
+        os_deps_extra: [],
         pip2_deps: ["j2"],
-        docker_deps: [
-          "docker-ce",
-          "docker-ce-cli",
-          "amazon-ecr-credential-helper",
-        ],
-        os_deps: [
-          "apt-transport-https",
-          "ca-certificates",
-          "curl",
-          "software-properties-common",
-          "awscli",
-          "jq",
-          "python3-pip",
-          "python-pip",
-          "direnv",
-          "openvpn",
-          "openvpn-systemd-resolved",
-        ],
       }
     end
   end
