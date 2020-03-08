@@ -160,7 +160,14 @@
         lineinfile:
           path: ~/.bashrc
           line: 'export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
-
+      - debug:
+          msg: "{{ clone_git }}"
+      - name: clone repos
+        git:
+          repo: "{{item.src}}"
+          dest: "{{item.dest}}"
+        with_items: "{{ clone_git }}"
+        when: clone_git
 
       - name: extend PATH
         lineinfile:
