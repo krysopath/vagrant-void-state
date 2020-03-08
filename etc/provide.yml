@@ -35,5 +35,8 @@
       import_tasks: provide_docker.yml
     - name: import openvpn tasks
       import_tasks: provide_openvpn.yml
+    - name: import asdf tasks
+      import_tasks: provide_asdf.yml
+      when: asdf.refresh|bool
     - name: import user tasks
       import_tasks: provide_user.yml

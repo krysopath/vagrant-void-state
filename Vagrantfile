@@ -46,7 +46,6 @@ Vagrant.configure("2") do |config|
           latest: true
         },
         vault_token: ENV['VAULT_TOKEN'],
-        asdf_tools: true,
         clone_git: [
           {src: "git@bitbucket.org:3yourmind/polyrepo.git", dest: "~/src/3yourmind/polyrepo/"},
           {src: "git@bitbucket.org:3yourmind/button3d.git", dest: "~/src/3yourmind/button3d"},
@@ -60,6 +59,7 @@ Vagrant.configure("2") do |config|
         AcceptEnv: ["VAULT_*", "AWS_*"],
         docker_compose: "1.25.4",
         asdf: {
+          refresh: true,
           version: "v0.7.6",
           path: "~/.asdf/bin/asdf",
           plugins: [

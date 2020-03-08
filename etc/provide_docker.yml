@@ -29,7 +29,7 @@
     src: home/vagrant/.docker
     dest: /home/vagrant/
 
-- name: Adding user {{ user }}
+- name: Adding user to docker group
   become: yes
   user:
     name: vagrant

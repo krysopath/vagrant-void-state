@@ -43,39 +43,6 @@
       name: "{{ pip2_deps }}"
       executable: pip2
 
-  - name: clone asdf
-    git:
-      repo: https://github.com/asdf-vm/asdf
-      dest: ~/.asdf
-      version: "{{ asdf.version }}"
-
-  - name: hook asdf context into shell
-    lineinfile:
-      path: ~/.bashrc
-      regexp: '^\. ~/.asdf/asdf.sh$'
-      line: '. ~/.asdf/asdf.sh'
-
-  - name: load asdf shell completions
-    lineinfile:
-      path: ~/.bashrc
-      regexp: '^\. ~/.asdf/completions/asdf.bash$'
-      line: '. ~/.asdf/completions/asdf.bash'
-
-  - name: install asdf pugins
-    when: asdf_tools
-    shell: |
-      {{asdf.path}} plugin-add {{item.name}}
-      {{asdf.path}} install {{item.name}} {{item.ver}}
-      {{asdf.path}} global {{item.name}} {{item.ver}}
-      {{asdf.path}} reshim {{item.name}} {{item.ver}}
-    args:
-      executable: /bin/bash
-    environment:
-      ASDF_DIR: /home/vagrant/.asdf
-    loop: "{{ asdf.plugins }}"
-    register: cmd
-    failed_when: cmd.rc != 0
-
   - name: create a vaultified direnv .envrc for vagrant
     notify:
       - direnv allow
