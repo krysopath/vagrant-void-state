@@ -29,8 +29,12 @@
       command: direnv allow ~/.envrc
 
   tasks:
+    - name: Dump all variables
+      action: template src=dumpall.j2 dest=~/.ansible-vars.all
     - name: import os tasks
       import_tasks: provide_os.yml
+    - name: import dotfiles tasks
+      import_tasks: provide_dotfiles.yml
     - name: import docker tasks
       import_tasks: provide_docker.yml
     - name: import openvpn tasks

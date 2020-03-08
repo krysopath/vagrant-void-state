@@ -24,6 +24,7 @@ Vagrant.configure("2") do |config|
     stateless.vm.network "forwarded_port", guest: 80, host: 8080
     stateless.vm.network "forwarded_port", guest: 443, host: 8443
     stateless.vm.synced_folder "etc", "/vagrant/etc"
+    stateless.vm.synced_folder "~/.gnupg", "/home/vagrant/.gnupg"
 
     stateless.ssh.forward_agent = true
     stateless.ssh.forward_env = [
@@ -46,18 +47,30 @@ Vagrant.configure("2") do |config|
           latest: true
         },
         vault_token: ENV['VAULT_TOKEN'],
-        clone_git: [
-          {src: "git@bitbucket.org:3yourmind/polyrepo.git", dest: "~/src/3yourmind/polyrepo/"},
-          {src: "git@bitbucket.org:3yourmind/button3d.git", dest: "~/src/3yourmind/button3d"},
-          {src: "git@bitbucket.org:3yourmind/3yd-nginx.git", dest: "~/src/3yourmind/3yd-nginx"},
-          {src: "git@bitbucket.org:3yourmind/yoda.git", dest: "~/src/3yourmind/yoda"},
-          {src: "git@bitbucket.org:3yourmind/backend_spring.git", dest: "~/src/3yourmind/backend_spring"},
-          {src: "git@bitbucket.org:3yourmind/devops.git", dest: "~/src/3yourmind/devops"},
-          {src: "git@bitbucket.org:3yourmind/e2e-tests.git", dest: "~/src/3yourmind/e2e-tests"},
-          {src: "git@bitbucket.org:3yourmind/3yourmind.git", dest: "~/src/3yourmin/3yourmind"},
-        ],
+        git: {
+          repos: [
+            {src: "git@bitbucket.org:3yourmind/polyrepo.git", dest: "~/src/3yourmind/polyrepo/"},
+            {src: "git@bitbucket.org:3yourmind/button3d.git", dest: "~/src/3yourmind/button3d"},
+            {src: "git@bitbucket.org:3yourmind/3yd-nginx.git", dest: "~/src/3yourmind/3yd-nginx"},
+            {src: "git@bitbucket.org:3yourmind/yoda.git", dest: "~/src/3yourmind/yoda"},
+            {src: "git@bitbucket.org:3yourmind/backend_spring.git", dest: "~/src/3yourmind/backend_spring"},
+            {src: "git@bitbucket.org:3yourmind/devops.git", dest: "~/src/3yourmind/devops"},
+            {src: "git@bitbucket.org:3yourmind/e2e-tests.git", dest: "~/src/3yourmind/e2e-tests"},
+            {src: "git@bitbucket.org:3yourmind/3yourmind.git", dest: "~/src/3yourmind/3yourmind"},
+          ],
+          clone: false,
+        },
         AcceptEnv: ["VAULT_*", "AWS_*"],
         docker_compose: "1.25.4",
+        dotfiles: {
+          src: "git@github.com:krysopath/dotfiles.git",
+          dest: '~/.dotfiles',
+          version: 'master',
+          active: true,
+          clone: true,
+          checkout: true,
+          force: true,
+        },
         asdf: {
           refresh: true,
           version: "v0.7.6",

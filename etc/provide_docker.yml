@@ -27,12 +27,12 @@
 - name: configure ecr helper
   copy:
     src: home/vagrant/.docker
-    dest: /home/vagrant/
+    dest: "/home/{{ lookup('env', 'USER') }}"
 
 - name: Adding user to docker group
   become: yes
   user:
-    name: vagrant
+    name: "{{ lookup('env', 'USER') }}"
     groups: docker
     append: yes
 

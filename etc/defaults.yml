@@ -1,0 +1,72 @@
+AcceptEnv:
+- VAULT_*
+- AWS_*
+apt:
+  cache_valid: 3600
+  latest: true
+asdf:
+  path: ~/.asdf/bin/asdf
+  plugins:
+  - name: helm
+    ver: 3.1.1
+  - name: kubectl
+    ver: 1.17.3
+  - name: nomad
+    ver: 0.10.4
+  - name: terraform
+    ver: 0.12.21
+  - name: terragrunt
+    ver: 0.22.4
+  - name: vault
+    ver: 1.3.0
+  - name: k9s
+    ver: v0.17.5
+  refresh: true
+  version: v0.7.6
+docker_compose: 1.25.4
+docker_deps:
+- docker-ce
+- docker-ce-cli
+- amazon-ecr-credential-helper
+dotfiles:
+  active: true
+  checkout: true
+  clone: true
+  dest: ~/.dotfiles
+  force: true
+  src: git@github.com:krysopath/dotfiles.git
+  version: master
+git:
+  clone: false
+  repos:
+  - dest: ~/src/3yourmind/polyrepo/
+    src: git@bitbucket.org:3yourmind/polyrepo.git
+  - dest: ~/src/3yourmind/button3d
+    src: git@bitbucket.org:3yourmind/button3d.git
+  - dest: ~/src/3yourmind/3yd-nginx
+    src: git@bitbucket.org:3yourmind/3yd-nginx.git
+  - dest: ~/src/3yourmind/yoda
+    src: git@bitbucket.org:3yourmind/yoda.git
+  - dest: ~/src/3yourmind/backend_spring
+    src: git@bitbucket.org:3yourmind/backend_spring.git
+  - dest: ~/src/3yourmind/devops
+    src: git@bitbucket.org:3yourmind/devops.git
+  - dest: ~/src/3yourmind/e2e-tests
+    src: git@bitbucket.org:3yourmind/e2e-tests.git
+  - dest: ~/src/3yourmind/3yourmind
+    src: git@bitbucket.org:3yourmind/3yourmind.git
+os_deps:
+- apt-transport-https
+- ca-certificates
+- curl
+- software-properties-common
+- awscli
+- jq
+- python3-pip
+- python-pip
+- direnv
+- openvpn
+- openvpn-systemd-resolved
+pip2_deps:
+- j2
+

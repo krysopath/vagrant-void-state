@@ -8,15 +8,26 @@
       dest: ~/.asdf
       version: "{{ asdf.version }}"
 
+  - name: create ~/.rc.d/
+    file:
+      path: ~/.rc.d
+      state: directory
+
+  - name: create ~/.rc.d/20-asdf
+    file:
+      path: ~/.rc.d/20-asdf
+      state: touch
+      mode: u=rwx
+
   - name: hook asdf context into shell
     lineinfile:
-      path: ~/.bashrc
+      path: ~/.rc.d/20-asdf
       regexp: '^\. ~/.asdf/asdf.sh$'
       line: '. ~/.asdf/asdf.sh'
 
   - name: load asdf shell completions
     lineinfile:
-      path: ~/.bashrc
+      path: ~/.rc.d/20-asdf
       regexp: '^\. ~/.asdf/completions/asdf.bash$'
       line: '. ~/.asdf/completions/asdf.bash'
 
@@ -30,5 +41,5 @@
     args:
       executable: /bin/bash
     environment:
-      ASDF_DIR: /home/vagrant/.asdf
+      ASDF_DIR: /home/{{ lookup('env', 'USER') }}/.asdf
     loop: "{{ asdf.plugins }}"

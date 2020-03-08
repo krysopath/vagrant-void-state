@@ -22,21 +22,30 @@
       enabled: yes
       daemon-reload: yes
 
+  - name: create ~/.rc.d/
+    file:
+      path: ~/.rc.d/
+      state: directory
+  - name: create ~/.rc.d/98-vagrant
+    file:
+      path: ~/.rc.d/98-vagrant
+      state: touch
+      mode: u=rwx
+
   - name: extend PATH
     lineinfile:
-      path: ~/.bashrc
+      path: ~/.rc.d/98-vagrant
       line: 'export PATH=$PATH:/vagrant/bin'
   - name: SSH_AUTH_SOCK shell variable
     lineinfile:
-      path: ~/.bashrc
+      path:  ~/.rc.d/98-vagrant
       line: 'export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
   - name: clone repos
     git:
       repo: "{{item.src}}"
       dest: "{{item.dest}}"
-    with_items: "{{ clone_git }}"
-    when: clone_git
-
+    with_items: "{{ git.repos }}"
+    when: git.clone
 
   - name: install pip deps
     pip:
@@ -49,18 +58,20 @@
     template:
       src: home/vagrant/.envrc
       dest: ~/.envrc
+
   - name: enable direnv hooks
     lineinfile:
-      path: ~/.bashrc
+      path: ~/.rc.d/98-vagrant
       regexp: '^eval "$(direnv hook bash)"$'
       line: 'eval "$(direnv hook bash)"'
 
-  - name: copy .aliases
+  - name: copy global .aliases
     copy:
       src: .aliases
-      dest: ~/.aliases
-  - name: hook aliases file
+      dest: ~/.rc.d/99-global-alias
+
+  - name: hook .rc.d directory into .bashrc
     lineinfile:
       path: ~/.bashrc
-      regexp: '^. ~/.aliases$'
-      line: '. ~/.aliases'
+      regexp: '^for asset in ~/.rc.d/*; do [ -x $asset ] && . $asset; done$'
+      line: 'for asset in ~/.rc.d/*; do [ -x $asset ] && . $asset; done'

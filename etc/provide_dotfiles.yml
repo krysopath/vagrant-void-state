@@ -1,0 +1,41 @@
+---
+- name: initialize dotfiles
+  when: dotfiles.active
+  become: vagrant
+  block:
+  - name: clone dotfiles
+    when: dotfiles.clone
+    git:
+      repo: "{{dotfiles.src}}"
+      dest: "{{dotfiles.dest}}"
+      bare: yes
+      #- name: dotfiles checkout
+      #  git:
+      #    repo: "{{dotfiles.src}}"
+      #    dest: "{{dotfiles.dest}}"
+      #    separate_git_dir: /home/vagrant/.dotfiles
+      #    force: yes
+      #    verify_commit: yes
+      #    version: "{{ dotfiles.version }}"
+
+  - name: dotfiles checkout
+    when: dotfiles.checkout
+    shell: "git --git-dir=$HOME/.dotfiles --work-tree=$HOME checkout {{ '--force' if dotfiles.force else ''}}  || true"
+    register: git_out
+  - debug:
+      msg: "{{ git_out.stdout }}"
+
+  - name: set dotfiles alias
+    lineinfile:
+      path: ~/.rc.d/91-dotfiles
+      line: "alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'"
+
+  - name: touch ~/.gitignore
+    file:
+      path: ~/.gitignore
+      state: touch
+
+  - name: exclude dotfiles from git
+    lineinfile:
+      path: ~/.gitignore
+      line: ".dotfiles"

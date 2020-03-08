@@ -29,6 +29,15 @@
       regexp: '^StartLimitInterval=$'
       line: 'StartLimitInterval=0'
 
+  - name: provide secrets file
+    notify:
+      - restart openvpn
+      - sleep for openvpn
+    copy:
+      src: vpn-auth
+      dest: /etc/openvpn/client/vagrant-auth
+      mode: u=rwx,go-rwx
+
   - name: copy openvpn client conf
     notify:
       - restart openvpn
