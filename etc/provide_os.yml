@@ -1,0 +1,29 @@
+---
+- name: update apt cache
+  become: yes
+  apt:
+    update_cache: yes
+    cache_valid_time: "{{ apt.cache_valid }}"
+
+- name: update os to latest
+  become: yes
+  apt:
+    name: "*"
+    state: latest
+  when: apt.latest
+
+- name: install os deps
+  become: yes
+  apt:
+    name: "{{ os_deps }}"
+    state: latest
+
+- name: allow sending some shell variables
+  become: yes
+  notify:
+    - restart sshd
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^AcceptEnv LANG LC_\*$'
+    line: "AcceptEnv LANG LC_* {{ AcceptEnv | join(' ') }}"
+

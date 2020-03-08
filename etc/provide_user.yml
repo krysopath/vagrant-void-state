@@ -1,0 +1,99 @@
+---
+- name: create environment
+  become: vagrant
+  block:
+  - name: set ~/.ssh/config defaults
+    template:
+      src: home/vagrant/.ssh/config
+      dest: ~/.ssh/config
+  - name: create user service dir
+    file:
+      name: ~/.config/systemd/user
+      state: directory
+  - name: render ssh-agent user service
+    template:
+      src: home/vagrant/.config/systemd/user/ssh-agent.service
+      dest: ~/.config/systemd/user/ssh-agent.service
+  - name: enable user service for ssh-agent
+    systemd:
+      name: ssh-agent
+      scope: user
+      state: started
+      enabled: yes
+      daemon-reload: yes
+
+  - name: extend PATH
+    lineinfile:
+      path: ~/.bashrc
+      line: 'export PATH=$PATH:/vagrant/bin'
+  - name: SSH_AUTH_SOCK shell variable
+    lineinfile:
+      path: ~/.bashrc
+      line: 'export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
+  - name: clone repos
+    git:
+      repo: "{{item.src}}"
+      dest: "{{item.dest}}"
+    with_items: "{{ clone_git }}"
+    when: clone_git
+
+
+  - name: install pip deps
+    pip:
+      name: "{{ pip2_deps }}"
+      executable: pip2
+
+  - name: clone asdf
+    git:
+      repo: https://github.com/asdf-vm/asdf
+      dest: ~/.asdf
+      version: "{{ asdf.version }}"
+
+  - name: hook asdf context into shell
+    lineinfile:
+      path: ~/.bashrc
+      regexp: '^\. ~/.asdf/asdf.sh$'
+      line: '. ~/.asdf/asdf.sh'
+
+  - name: load asdf shell completions
+    lineinfile:
+      path: ~/.bashrc
+      regexp: '^\. ~/.asdf/completions/asdf.bash$'
+      line: '. ~/.asdf/completions/asdf.bash'
+
+  - name: install asdf pugins
+    when: asdf_tools
+    shell: |
+      {{asdf.path}} plugin-add {{item.name}}
+      {{asdf.path}} install {{item.name}} {{item.ver}}
+      {{asdf.path}} global {{item.name}} {{item.ver}}
+      {{asdf.path}} reshim {{item.name}} {{item.ver}}
+    args:
+      executable: /bin/bash
+    environment:
+      ASDF_DIR: /home/vagrant/.asdf
+    loop: "{{ asdf.plugins }}"
+    register: cmd
+    failed_when: cmd.rc != 0
+
+  - name: create a vaultified direnv .envrc for vagrant
+    notify:
+      - direnv allow
+    template:
+      src: home/vagrant/.envrc
+      dest: ~/.envrc
+  - name: enable direnv hooks
+    lineinfile:
+      path: ~/.bashrc
+      regexp: '^eval "$(direnv hook bash)"$'
+      line: 'eval "$(direnv hook bash)"'
+
+  - name: copy .aliases
+    copy:
+      src: .aliases
+      dest: ~/.aliases
+  - name: hook aliases file
+    lineinfile:
+      path: ~/.bashrc
+      regexp: '^. ~/.aliases$'
+      line: '. ~/.aliases'

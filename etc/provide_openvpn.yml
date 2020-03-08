@@ -1,0 +1,47 @@
+---
+- name:
+  become: yes
+  block:
+  - name: make openvpn always restart
+    notify:
+      - daemon reload
+    lineinfile:
+      path: /lib/systemd/system/openvpn-client@.service
+      insertafter: '^\[Service\]$'
+      regexp: '^Restart=always$'
+      line: 'Restart=always'
+
+  - name: make openvpn always restart
+    notify:
+      - daemon reload
+    lineinfile:
+      path: /lib/systemd/system/openvpn-client@.service
+      insertafter: '^\[Service\]$'
+      regexp: '^RestartSec=$'
+      line: 'RestartSec=5'
+
+  - name: make openvpn always restart
+    notify:
+      - daemon reload
+    lineinfile:
+      path: /lib/systemd/system/openvpn-client@.service
+      insertafter: '^\[Service\]$'
+      regexp: '^StartLimitInterval=$'
+      line: 'StartLimitInterval=0'
+
+  - name: copy openvpn client conf
+    notify:
+      - restart openvpn
+      - sleep for openvpn
+    copy:
+      src: client.ovpn
+      dest: /etc/openvpn/client/vagrant.conf
+
+  - name: disable DNSSEC for systemd-resolved because systemd is epiko
+    notify:
+      - restart systemd-resolved
+    lineinfile:
+      path: /etc/systemd/resolved.conf
+      regexp: '^DNSSEC=yes$'
+      line: 'DNSSEC=no'
+
