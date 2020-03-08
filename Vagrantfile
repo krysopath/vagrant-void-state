@@ -17,6 +17,15 @@ Vagrant.configure("2") do |config|
       v.cpus = NUM_CORES
     end
 
+    stateless.vm.provider "aws" do |aws|
+      aws.instance_type = "t3.medium"
+      aws.keypair_name = "Georg"
+      aws.monitoring = false
+      aws.region = "eu-central-1"
+      aws.subnet_id = "vpc-3f52bc56"
+      aws.ami = "ami-066866b740d9ce5a7"
+    end
+
     stateless.vm.network "private_network", ip: "10.10.10.10"
 
     stateless.vm.box = "generic/ubuntu1904"

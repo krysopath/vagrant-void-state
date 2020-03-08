@@ -13,6 +13,17 @@ provisioning.
 - vagrant
 - make
 
+## when you want the aws provider
+
+```bash
+sudo apt install libcurl4-openssl-dev
+vagrant plugin install --verbose vagrant-aws
+```
+
+> If ruby is being ruby and rake only bundles conflicts, set
+> `VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install --verbose vagrant-aws`
+> for greater yolo engineering
+
 ## setup with libvirt (optional)
 
 install the dependencies:
