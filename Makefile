@@ -9,3 +9,6 @@ provision: up
 
 ssh: up
 	@VAULT_TOKEN=$(VAULT_TOKEN) vagrant ssh
+
+ansible:
+	ansible-playbook -K -e @./etc/defaults.yml -i 127.0.0.1, ./etc/provide.yml
