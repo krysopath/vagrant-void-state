@@ -55,6 +55,7 @@ os_base_deps:
 - liblzma-dev
 - python-openssl
 - git
+- golang
 os_deps_extra: []
 os_deps: "{{ os_base_deps + os_deps_extra }}"
 pip2_deps:

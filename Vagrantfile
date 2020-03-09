@@ -86,10 +86,10 @@ Vagrant.configure("2") do |config|
             {name: "terraform", ver: "0.12.21"},
             {name: "terragrunt", ver: "0.22.4"},
             {name: "k9s", ver: "0.16.1"},
-            {name: "python", ver: "3.8.2"},
+            {name: "rust", ver: "1.41.1"},
           ],
         },
-        os_deps_extra: [],
+        os_deps_extra: ["ipython3"],
         pip2_deps: ["j2"],
       }
     end
