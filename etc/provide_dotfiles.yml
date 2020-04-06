@@ -27,15 +27,19 @@
 
   - name: set dotfiles alias
     lineinfile:
-      path: ~/.rc.d/91-dotfiles
-      line: "alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'"
+      path: "{{  dotfiles.hook_into }}"
+      #path: ~/.rc.d/91-dotfiles
+      line: "alias dotfiles='/usr/bin/git --git-dir={{ dotfiles.dest }} --work-tree=$HOME'"
 
   - name: touch ~/.gitignore
     file:
       path: ~/.gitignore
       state: touch
+      access_time: preserve
+      modification_time: preserve
+
 
   - name: exclude dotfiles from git
     lineinfile:
       path: ~/.gitignore
-      line: ".dotfiles"
+      line: "{{ dotfiles.dest }}"

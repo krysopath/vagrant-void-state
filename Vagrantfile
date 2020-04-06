@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
       a.extra_vars = {
         apt: {
           cache_valid: 3600,
-          latest: true
+          latest: false
         },
         vault_token: ENV['VAULT_TOKEN'],
         git: {
@@ -70,7 +70,7 @@ Vagrant.configure("2") do |config|
             {src: "git@bitbucket.org:3yourmind/e2e-tests.git", dest: "~/src/threeyd/e2e-tests"},
             {src: "git@bitbucket.org:3yourmind/3yourmind.git", dest: "~/src/threeyd/3yourmind"},
           ],
-          clone: true,
+          clone: false,
         },
         dotfiles: {
           src: "git@github.com:krysopath/dotfiles.git",
@@ -80,13 +80,13 @@ Vagrant.configure("2") do |config|
           refresh: true,
           plugins: [
             {name: "vault", ver: "1.3.0"},
-            {name: "helm", ver: "3.1.1"},
-            {name: "kubectl", ver: "1.17.3"},
-            {name: "nomad", ver: "0.10.4"},
-            {name: "terraform", ver: "0.12.21"},
-            {name: "terragrunt", ver: "0.22.4"},
-            {name: "k9s", ver: "0.16.1"},
-            {name: "rust", ver: "1.41.1"},
+#            {name: "helm", ver: "3.1.1"},
+#            {name: "kubectl", ver: "1.17.3"},
+#            {name: "nomad", ver: "0.10.4"},
+#            {name: "terraform", ver: "0.12.21"},
+#            {name: "terragrunt", ver: "0.22.4"},
+#            {name: "k9s", ver: "0.16.1"},
+#            {name: "rust", ver: "1.41.1"},
           ],
         },
         os_deps_extra: ["ipython3"],

@@ -19,10 +19,11 @@ dotfiles:
   active: false
   checkout: true
   clone: true
-  dest: ~/.dotfiles
+  dest: $HOME/.dotfiles
   force: true
   src: ''
   version: master
+  hook_into: $HOME/.bashrc
 git:
   clone: false
   repos: []
@@ -60,4 +61,7 @@ os_deps_extra: []
 os_deps: "{{ os_base_deps + os_deps_extra }}"
 pip2_deps:
 - j2
+
+pip3_deps:
+- sshuttle
 

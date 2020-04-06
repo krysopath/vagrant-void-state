@@ -26,20 +26,22 @@
     file:
       path: ~/.rc.d/
       state: directory
-  - name: create ~/.rc.d/98-vagrant
+  - name: create ~/.rc.d/95-user
     file:
-      path: ~/.rc.d/98-vagrant
+      path: ~/.rc.d/95-user
       state: touch
       mode: u=rwx
+      access_time: preserve
+      modification_time: preserve
 
   - name: extend PATH
     lineinfile:
-      path: ~/.rc.d/98-vagrant
+      path: ~/.rc.d/95-user
       line: 'export PATH=$PATH:/vagrant/bin'
   - name: SSH_AUTH_SOCK shell variable
     lineinfile:
-      path:  ~/.rc.d/98-vagrant
-      line: 'export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
+      path:  ~/.rc.d/95-user
+      line: '[ -z $SSH_AUTH_SOCK ] && export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"'
   - name: clone repos
     git:
       repo: "{{item.src}}"
@@ -52,6 +54,11 @@
       name: "{{ pip2_deps }}"
       executable: pip2
 
+  - name: install pip3 deps
+    pip:
+      name: "{{ pip3_deps }}"
+      executable: pip3
+
   - name: create a vaultified direnv .envrc for vagrant
     notify:
       - direnv allow
@@ -61,7 +68,7 @@
 
   - name: enable direnv hooks
     lineinfile:
-      path: ~/.rc.d/98-vagrant
+      path: ~/.rc.d/95-user
       regexp: '^eval "$(direnv hook bash)"$'
       line: 'eval "$(direnv hook bash)"'
 

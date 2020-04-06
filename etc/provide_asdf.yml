@@ -18,6 +18,8 @@
       path: ~/.rc.d/20-asdf
       state: touch
       mode: u=rwx
+      access_time: preserve
+      modification_time: preserve
 
   - name: hook asdf context into shell
     lineinfile:
